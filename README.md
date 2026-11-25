@@ -14,7 +14,7 @@ For each frame of a night driving video:
 
 1. **Lift:** gently brightens the real image (CLAHE on the lightness channel). Nothing is invented.
 2. **Detect:** a YOLOv8 model finds people, cyclists, motorbikes and animals.
-3. **Track:** keeps a stable ID on each hazard, so frames don't flicker.
+3. **Track:** keeps a stable ID on each hazard, so frames don't flicker. A ground check ignores "people" whose feet are above road level, such as faces on billboards.
 4. **Frame:** draws a calm amber frame around each hazard. Text labels are off by default and can be switched on.
 5. **HUD:** a small "Night Confidence" indicator with a hazard count, plus an amber edge glow when a hazard is close.
 
@@ -31,8 +31,20 @@ Options:
 - `--labels`: shows class labels (Person, Cyclist, Animal) on the frames
 - `--conf 0.3`: detection confidence threshold
 - `--max-width 1280`: resizes large videos for speed
+- `--model yolov8n.pt --imgsz 640`: faster but misses more small pedestrians (default is `yolov8s.pt` at 960 px)
 
 The model weights (`yolov8n.pt`) download automatically on the first run.
+
+## Result on real night footage
+
+`demo_night_city.mp4` shows a real night drive through a city, without (left) and with Night Confidence (right). Pedestrians on the sidewalks are framed in amber; the view is gently lifted.
+
+Footage: "Taxis driving through the streets at night" from [Mixkit](https://mixkit.co), used under the Mixkit License.
+
+What I learned while testing:
+
+- The smallest model (YOLOv8n at 640 px) missed several distant pedestrians. YOLOv8s at 960 px found most of them, at about 3× the compute.
+- The detector framed people printed on a billboard. A simple ground check (feet must be below road level) removed these false alarms.
 
 ## Honest limits
 

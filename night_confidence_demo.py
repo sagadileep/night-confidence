@@ -7,6 +7,8 @@ What it does, frame by frame:
                 without inventing anything.
   2. DETECT   - a YOLOv8 model finds people, cyclists and animals (the hazards).
   3. TRACK    - keeps the same ID on each hazard so the frames don't flicker.
+               A ground check drops 'people' whose feet are above road level
+               (for example, faces on billboards).
   4. FRAME    - draws a calm amber frame around each hazard. Text labels are OFF
                 by default (switch on with --labels), so the view stays clean.
   5. HUD      - a small "NIGHT CONFIDENCE" indicator, plus an amber edge glow when
@@ -16,6 +18,7 @@ Usage:
   python night_confidence_demo.py input.mp4 output.mp4
   python night_confidence_demo.py input.mp4 output.mp4 --side-by-side   (before | after)
   python night_confidence_demo.py input.mp4 output.mp4 --labels         (show class labels)
+  python night_confidence_demo.py input.mp4 output.mp4 --model yolov8n.pt --imgsz 640   (faster, less accurate)
 
 Limits (honest): this demo uses a normal camera video, not a thermal camera, and a
 general-purpose model trained mostly on daytime images. Deer are not a separate class
@@ -106,8 +109,11 @@ def tag(img, text, color):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('input'); ap.add_argument('output')
-    ap.add_argument('--model', default='yolov8n.pt')
-    ap.add_argument('--conf', type=float, default=0.3)
+    ap.add_argument('--model', default='yolov8s.pt')
+    ap.add_argument('--conf', type=float, default=0.25)
+    ap.add_argument('--imgsz', type=int, default=960)
+    ap.add_argument('--ground', type=float, default=0.5,
+                    help='ignore hazards whose bottom edge is above this fraction of the image height (e.g. people on billboards)')
     ap.add_argument('--labels', action='store_true')
     ap.add_argument('--side-by-side', action='store_true')
     ap.add_argument('--max-width', type=int, default=1280)
@@ -137,13 +143,15 @@ def main():
             break
         frame = cv2.resize(frame, (W, H))
         lifted = lift(frame)
-        res = model.track(lifted, conf=args.conf, persist=True, verbose=False, classes=list(HAZARDS))[0]
+        res = model.track(lifted, conf=args.conf, imgsz=args.imgsz, persist=True, verbose=False, classes=list(HAZARDS))[0]
         view = lifted.copy()
         big = 0.0
         count = 0
         for b in res.boxes:
             cls = int(b.cls[0])
             box = b.xyxy[0].tolist()
+            if box[3] < args.ground * H:   # ground check: real road users stand on the ground
+                continue
             draw_frame(view, box, HAZARDS[cls] if args.labels else None)
             count += 1
             big = max(big, (box[3] - box[1]) / H)
