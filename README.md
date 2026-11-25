@@ -8,6 +8,10 @@ Author: Saga Dileep Sai, M.Sc. Robotic Systems Engineering, RWTH Aachen
 
 Night driving is stressful and dangerous. Many drivers strain their eyes, get blinded by glare, or avoid driving after dark altogether; older drivers most of all. Night Confidence combines sensors a modern car already has (thermal camera, radar, front cameras, head-up display) with AI computer vision and a fleet-refreshed daytime road layer. The driver sees the real night, gently lifted, with every hazard framed early in calm amber.
 
+## Concept film
+
+`concept_film.mp4` (2:12) tells the full story: three friends and the problems of night driving, the equipment, a before-and-after comparison, more ideas for the future, and this working prototype.
+
 ## What this prototype does
 
 For each frame of a night driving video:
