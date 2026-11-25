@@ -35,11 +35,15 @@ Options:
 
 The model weights (`yolov8n.pt`) download automatically on the first run.
 
-## Result on real night footage
+## Results on real night footage
 
 `demo_night_city.mp4` shows a real night drive through a city, without (left) and with Night Confidence (right). Pedestrians on the sidewalks are framed in amber; the view is gently lifted.
 
 Footage: "Taxis driving through the streets at night" from [Mixkit](https://mixkit.co), used under the Mixkit License.
+
+`demo_rainy_crossing.mp4` is a stress test: a rainy night crossing in Times Square, filmed from street level. Rain, wet reflections, umbrellas and billboards full of faces. The prototype framed up to 13 pedestrians at once, ignored the faces on the billboards, and turned on the amber edge glow when people came close to the camera.
+
+Footage: "Times Square during a rainy night" from [Mixkit](https://mixkit.co), used under the Mixkit License.
 
 What I learned while testing:
 
